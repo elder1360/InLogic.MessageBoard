@@ -1,12 +1,14 @@
-﻿using MediatR;
+﻿using Inlogic.MessageBoard.Console;
+using Inlogic.MessageBoard.Console.Requests;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 services.AddMediatR(c => c.RegisterServicesFromAssembly(typeof(Program).Assembly));
-
+services.AddSingleton<IInMemoryStateStore, InMemoryStateStore>();
 var serviceProvider = services.BuildServiceProvider();
 
-var mediator = serviceProvider.GetRequiredService<IMediator>(); // Resolve Program class
+var mediator = serviceProvider.GetRequiredService<IMediator>();
 RunInteractiveConsole(mediator);
 
 static void RunInteractiveConsole(IMediator mediator)
@@ -47,18 +49,11 @@ static void Process(string input, IMediator mediator)
   else if (parts.Length == 2 && parts[1] == "wall")
   {
     var userName = parts[0];
-    mediator.Send(new DisplayWallCommand(userName)).Wait();
+    mediator.Send(new DisplayWallQuery(userName)).Wait();
   }
   else
   {
     var projectName = parts[0];
-    mediator.Send(new ReadProjectCommand(projectName)).Wait();
+    mediator.Send(new ReadProjectQuery(projectName)).Wait();
   }
 }
-
-
-public record PostMessageCommand(string UserName, string ProjectName, string Message) : IRequest<Unit>;
-public record ReadProjectCommand(string ProjectName) : IRequest<Unit>;
-public record FollowProjectCommand(string UserName, string ProjectName) : IRequest<Unit>;
-public record DisplayWallCommand(string UserName) : IRequest<Unit>;
-
