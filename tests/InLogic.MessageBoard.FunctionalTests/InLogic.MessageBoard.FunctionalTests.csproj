@@ -21,7 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\InLogic.MessageBoard.Infrastructure\InLogic.MessageBoard.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\InLogic.MessageBoard.UseCases\InLogic.MessageBoard.UseCases.csproj" />
-    <ProjectReference Include="..\..\src\InLogic.MessageBoard.Web\InLogic.MessageBoard.Web.csproj" />
   </ItemGroup>
 
 </Project>
