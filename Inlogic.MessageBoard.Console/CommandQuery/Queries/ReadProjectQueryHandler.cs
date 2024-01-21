@@ -18,7 +18,7 @@ public class ReadProjectQueryHandler(IInMemoryStateStore stateStore) : IRequestH
     {
       stringBuilder.AppendLine(message.UserName);
       stringBuilder.Append(message.Content);
-      stringBuilder.Append($" ( {message.Timestamp.Minute} Minutes ago )");
+      stringBuilder.Append($" ( {Math.Round((TimeOnly.FromDateTime(DateTime.Now) - message.Timestamp).TotalMinutes,0)} Minutes ago )");
       stringBuilder.AppendLine();
     }
     var mes = stringBuilder.ToString();

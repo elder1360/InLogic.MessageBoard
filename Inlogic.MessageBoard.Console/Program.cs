@@ -1,4 +1,6 @@
 ﻿using Inlogic.MessageBoard.Console;
+using Inlogic.MessageBoard.Console.CommandQuery.Commands;
+using Inlogic.MessageBoard.Console.CommandQuery.Queries;
 using Inlogic.MessageBoard.Console.Requests;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
