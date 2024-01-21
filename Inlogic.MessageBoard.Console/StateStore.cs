@@ -19,10 +19,10 @@ public class InMemoryStateStore : IInMemoryStateStore
       _projectMessages[projectName] = value;
     }
 
-    value.Add(new Message(userName, content, TimeOnly.FromDateTime(DateTime.Now)));
+    value.Add(new Message(userName, content, DateTime.Now));
   }
 
-  public List<Message> ReadProjectMessages(string projectName)
+  public IEnumerable<Message> ReadProjectMessages(string projectName)
   {
     if (_projectMessages.TryGetValue(projectName, out var messages))
     {
@@ -35,7 +35,7 @@ public class InMemoryStateStore : IInMemoryStateStore
   {
     if (!_userFollowings.TryGetValue(userName, out var value))
     {
-      value = ([]);
+      value = [];
       _userFollowings[userName] = value;
     }
     if (!value.Contains(projectName))
@@ -44,24 +44,23 @@ public class InMemoryStateStore : IInMemoryStateStore
     }
   }
 
-  public List<Message> GetUserWall(string userName)
+  public Dictionary<string, IEnumerable<Message>> GetUserWall(string userName)
   {
-    var wallMessages = new List<Message>();
+    Dictionary<string, IEnumerable<Message>> wall = [];
     if (_userFollowings.TryGetValue(userName, out var projects))
     {
       foreach (var project in projects)
       {
-        wallMessages.AddRange(ReadProjectMessages(project));
+        wall.Add(project, ReadProjectMessages(project));
       }
     }
-
-    return [.. wallMessages.OrderByDescending(m => m.Timestamp)];
+    return wall;
   }
 }
 
-public class Message(string userName, string content, TimeOnly timestamp)
+public class Message(string userName, string content, DateTime timestamp)
 {
   public string UserName { get; } = userName;
   public string Content { get; } = content;
-  public TimeOnly Timestamp { get; } = timestamp;
+  public DateTime Timestamp { get; } = timestamp;
 }

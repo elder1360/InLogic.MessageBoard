@@ -1,7 +1,6 @@
 ﻿using Inlogic.MessageBoard.Console;
 using Inlogic.MessageBoard.Console.CommandQuery.Commands;
 using Inlogic.MessageBoard.Console.CommandQuery.Queries;
-using Inlogic.MessageBoard.Console.Requests;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,9 +11,9 @@ var serviceProvider = services.BuildServiceProvider();
 
 var mediator = serviceProvider.GetRequiredService<IMediator>();
 
-RunInteractiveConsole(mediator);
+await RunInteractiveConsoleAsync(mediator);
 
-static void RunInteractiveConsole(IMediator mediator)
+static async Task RunInteractiveConsoleAsync(IMediator mediator)
 {
   while (true)
   {
@@ -27,12 +26,12 @@ static void RunInteractiveConsole(IMediator mediator)
 
     if (!string.IsNullOrEmpty(input))
     {
-      Process(input, mediator);
+      await ProcessAsync(input, mediator);
     }
   }
 }
 
-static void Process(string input, IMediator mediator)
+static async Task ProcessAsync(string input, IMediator mediator)
 {
   var parts = input.Split(' ');
 
@@ -41,22 +40,22 @@ static void Process(string input, IMediator mediator)
     var userName = parts[0];
     var projectName = parts[2].TrimStart('@');
     var message = string.Join(' ', parts.Skip(3));
-    mediator.Send(new PostMessageCommand(userName, projectName, message)).Wait();
+    await mediator.Send(new PostMessageCommand(userName, projectName, message));
   }
   else if (parts.Length > 2 && parts[1] == "follows")
   {
     var userName = parts[0];
     var projectName = parts[2].TrimStart('@');
-    mediator.Send(new FollowProjectCommand(userName, projectName)).Wait();
+    await mediator.Send(new FollowProjectCommand(userName, projectName));
   }
   else if (parts.Length == 2 && parts[1] == "wall")
   {
     var userName = parts[0];
-    mediator.Send(new DisplayWallQuery(userName)).Wait();
+    await mediator.Send(new DisplayWallQuery(userName));
   }
   else
   {
     var projectName = parts[0];
-    mediator.Send(new ReadProjectQuery(projectName)).Wait();
+    await mediator.Send(new ReadProjectQuery(projectName));
   }
 }

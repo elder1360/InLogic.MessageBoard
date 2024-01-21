@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Inlogic.MessageBoard.Console;
 using Inlogic.MessageBoard.Console.CommandQuery.Queries;
 using MediatR;
 
@@ -9,7 +8,7 @@ public class ReadProjectQueryHandler(IInMemoryStateStore stateStore) : IRequestH
 {
   private readonly IInMemoryStateStore _stateStore = stateStore;
 
-  Task IRequestHandler<ReadProjectQuery>.Handle(ReadProjectQuery request, CancellationToken cancellationToken)
+  async Task IRequestHandler<ReadProjectQuery>.Handle(ReadProjectQuery request, CancellationToken cancellationToken)
   {
     var projectMessages = _stateStore.ReadProjectMessages(request.ProjectName);
     var stringBuilder = new StringBuilder();
@@ -18,11 +17,11 @@ public class ReadProjectQueryHandler(IInMemoryStateStore stateStore) : IRequestH
     {
       stringBuilder.AppendLine(message.UserName);
       stringBuilder.Append(message.Content);
-      stringBuilder.Append($" ( {Math.Round((TimeOnly.FromDateTime(DateTime.Now) - message.Timestamp).TotalMinutes,0)} Minutes ago )");
+      stringBuilder.Append($" ( {Math.Round((DateTime.Now - message.Timestamp).TotalMinutes, 0)} Minutes ago )");
       stringBuilder.AppendLine();
     }
     var mes = stringBuilder.ToString();
     System.Console.WriteLine(mes);
-    return Task.CompletedTask;
+    await Task.CompletedTask;
   }
 }
