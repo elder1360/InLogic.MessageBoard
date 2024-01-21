@@ -7,64 +7,60 @@ public class InMemoryStateStore : IInMemoryStateStore
 
   public InMemoryStateStore()
   {
-    _projectMessages = new Dictionary<string, List<Message>>();
-    _userFollowings = new Dictionary<string, List<string>>();
+    _projectMessages = [];
+    _userFollowings = [];
   }
 
   public void PostMessage(string userName, string projectName, string content)
   {
-    if (!_projectMessages.ContainsKey(projectName))
+    if (!_projectMessages.TryGetValue(projectName, out var value))
     {
-      _projectMessages[projectName] = new List<Message>();
+      value = [];
+      _projectMessages[projectName] = value;
     }
-    _projectMessages[projectName].Add(new Message(userName, content, DateTime.UtcNow));
+
+    value.Add(new Message(userName, content, DateTime.Now));
   }
 
-  public List<Message> ReadProjectMessages(string projectName)
+  public IEnumerable<Message> ReadProjectMessages(string projectName)
   {
     if (_projectMessages.TryGetValue(projectName, out var messages))
     {
       return messages;
     }
-    return new List<Message>();
+    return [];
   }
 
   public void FollowProject(string userName, string projectName)
   {
-    if (!_userFollowings.ContainsKey(userName))
+    if (!_userFollowings.TryGetValue(userName, out var value))
     {
-      _userFollowings[userName] = new List<string>();
+      value = [];
+      _userFollowings[userName] = value;
     }
-    if (!_userFollowings[userName].Contains(projectName))
+    if (!value.Contains(projectName))
     {
-      _userFollowings[userName].Add(projectName);
+      value.Add(projectName);
     }
   }
 
-  public List<Message> GetUserWall(string userName)
+  public Dictionary<string, IEnumerable<Message>> GetUserWall(string userName)
   {
-    var wallMessages = new List<Message>();
+    Dictionary<string, IEnumerable<Message>> wall = [];
     if (_userFollowings.TryGetValue(userName, out var projects))
     {
       foreach (var project in projects)
       {
-        wallMessages.AddRange(ReadProjectMessages(project));
+        wall.Add(project, ReadProjectMessages(project));
       }
     }
-    return wallMessages.OrderByDescending(m => m.Timestamp).ToList();
+    return wall;
   }
 }
 
-public class Message
+public class Message(string userName, string content, DateTime timestamp)
 {
-  public string UserName { get; }
-  public string Content { get; }
-  public DateTime Timestamp { get; }
-
-  public Message(string userName, string content, DateTime timestamp)
-  {
-    UserName = userName;
-    Content = content;
-    Timestamp = timestamp;
-  }
+  public string UserName { get; } = userName;
+  public string Content { get; } = content;
+  public DateTime Timestamp { get; } = timestamp;
 }
