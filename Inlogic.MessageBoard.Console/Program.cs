@@ -9,6 +9,7 @@ services.AddSingleton<IInMemoryStateStore, InMemoryStateStore>();
 var serviceProvider = services.BuildServiceProvider();
 
 var mediator = serviceProvider.GetRequiredService<IMediator>();
+
 RunInteractiveConsole(mediator);
 
 static void RunInteractiveConsole(IMediator mediator)

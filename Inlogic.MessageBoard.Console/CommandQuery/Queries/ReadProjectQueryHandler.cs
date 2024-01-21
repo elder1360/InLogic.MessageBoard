@@ -1,18 +1,16 @@
 ﻿using System.Text;
 using Inlogic.MessageBoard.Console;
-using Inlogic.MessageBoard.Console.Requests;
+using Inlogic.MessageBoard.Console.CommandQuery.Queries;
 using MediatR;
 
-public class ReadProjectHandler : IRequestHandler<ReadProjectQuery, Unit>
-{
-  IInMemoryStateStore _stateStore;
-  public ReadProjectHandler(IInMemoryStateStore stateStore)
-  {
-    this._stateStore = stateStore;
-  }
-  public Task<Unit> Handle(ReadProjectQuery request, CancellationToken cancellationToken)
-  {
+namespace Inlogic.MessageBoard.Console.Handlers.Queries;
 
+public class ReadProjectQueryHandler(IInMemoryStateStore stateStore) : IRequestHandler<ReadProjectQuery>
+{
+  private readonly IInMemoryStateStore _stateStore = stateStore;
+
+  Task IRequestHandler<ReadProjectQuery>.Handle(ReadProjectQuery request, CancellationToken cancellationToken)
+  {
     var projectMessages = _stateStore.ReadProjectMessages(request.ProjectName);
     var stringBuilder = new StringBuilder();
 
@@ -24,8 +22,7 @@ public class ReadProjectHandler : IRequestHandler<ReadProjectQuery, Unit>
       stringBuilder.AppendLine();
     }
     var mes = stringBuilder.ToString();
-    Console.WriteLine(mes);
-    return Task.FromResult(Unit.Value);
+    System.Console.WriteLine(mes);
+    return Task.CompletedTask;
   }
 }
-
